@@ -17,6 +17,12 @@ commands:
       - run:
           name: bqls
           command: bq ls
+      - run:
+          name: circlesha1
+          command: echo "${CIRCLE_SHA1}"
+      - run:
+          name: datasetname
+          command: date "+%Y%m%d"
 
 executors:
   gcloud:
