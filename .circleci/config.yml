@@ -22,7 +22,7 @@ commands:
           command: echo "${BQ_DATASET}"
       - run:
           name: make dataset
-          command: bq --location=US --dataset $BQ_DATASET
+          command: bq --location=US mk --dataset $BQ_DATASET
 
 executors:
   gcloud:
