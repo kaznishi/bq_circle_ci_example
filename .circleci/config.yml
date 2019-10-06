@@ -7,7 +7,7 @@ commands:
           name: Setup Credential
           command: |
             mkdir -p /etc/google/
-            echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode --ignore-garbase > "${GOOGLE_APPLICATION_CREDENTIALS}"
+            echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode
 
   make_dataset:
     steps:
@@ -27,6 +27,7 @@ jobs:
     executor: gcloud
     steps:
       - checkout
+      - setup_credential
       - make_dataset
 
 workflows:
