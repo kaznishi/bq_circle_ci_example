@@ -84,4 +84,13 @@ workflows:
           requires:
             - build
             - bq_setup
+
+  cleanup-test-dataset:
+    triggers:
+      - schedule:
+          cron: "32 14 * * *"
+          filters:
+            branches:
+              only: master
+    jobs:
       - bq_clean
