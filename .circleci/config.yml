@@ -62,6 +62,14 @@ jobs:
       - run:
           name: test
           command: go test -v
+  bq_clean:
+    executor: gcloud
+    steps:
+      - checkout
+      - setup_credential
+      - run:
+          name: clean 2 days ago datasets
+          command: bq ls --project_id=$GCP_PROJECT --datasets | grep ${BQ_DATASET_PREFIX}_`date -d '2 days ago' '+%Y%m%d'` | xargs ./scripts/bq_delete_datasets
 
 workflows:
   version: 2
@@ -73,3 +81,4 @@ workflows:
           requires:
             - build
             - bq_setup
+      - bq_clean

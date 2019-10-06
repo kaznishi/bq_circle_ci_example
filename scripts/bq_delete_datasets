@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+
+for each_dataset in $@
+do
+    echo "remove $each_dataset..."
+    bq rm -r -f -d $GCP_PROJECT:$each_dataset
+done
