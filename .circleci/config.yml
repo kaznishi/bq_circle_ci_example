@@ -23,8 +23,14 @@ executors:
           GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
 
 jobs:
-  hello:
+  build:
     executor: gcloud
     steps:
       - checkout
       - make_dataset
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+    - build:
