@@ -19,7 +19,7 @@ commands:
           command: bq ls
       - run:
           name: circlesha1
-          command: echo "${CIRCLE_SHA1}"
+          command: echo "${CIRCLE_SHA1:0:7}"
       - run:
           name: datasetname
           command: date "+%Y%m%d"
