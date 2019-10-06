@@ -7,13 +7,13 @@ commands:
           name: Setup Credential
           command: |
             mkdir -p /etc/google/
-            echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode
+            echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode > "${GOOGLE_APPLICATION_CREDENTIALS}"
 
   make_dataset:
     steps:
       - run:
           name: Hello
-          command: echo "Hello!!"
+          command: bq ls --headless --datasets
 
 executors:
   gcloud:
