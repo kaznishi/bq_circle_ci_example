@@ -68,6 +68,9 @@ jobs:
       - checkout
       - setup_credential
       - run:
+          name: Authorization
+          command: gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS}
+      - run:
           name: clean 2 days ago datasets
           command: bq ls --project_id=$GCP_PROJECT --datasets | grep ${BQ_DATASET_PREFIX}_`date -d '2 days ago' '+%Y%m%d'` | xargs ./scripts/bq_delete_datasets
 
