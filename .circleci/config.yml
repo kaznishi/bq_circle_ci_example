@@ -69,7 +69,7 @@ workflows:
     jobs:
       - build
       - bq_setup
-      - test
+      - test:
           requires:
             - build
             - bq_setup
