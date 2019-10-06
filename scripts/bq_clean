@@ -1,0 +1,3 @@
+#!/bin/bash -eu
+
+bq rm -r -f -d $GCP_PROJECT:$BQ_DATASET
