@@ -88,7 +88,7 @@ workflows:
   cleanup_test_dataset:
     triggers:
       - schedule:
-          cron: "45 14 * * *"
+          cron: "0 0 * * *"
           filters:
             branches:
               only: master
