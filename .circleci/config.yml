@@ -23,6 +23,12 @@ commands:
       - run:
           name: datasetname
           command: date "+%Y%m%d"
+      - run:
+          name: datasetname2
+          command: export BQDATASET="${BQ_DATASET_PREFIX}"-`date "+%Y%m%d"`-"${CIRCLE_SHA1:0:7}" >> $BASH_ENV
+      - run:
+          name: echo datasetname
+          command: echo "${BQDATASET}"
 
 executors:
   gcloud:
