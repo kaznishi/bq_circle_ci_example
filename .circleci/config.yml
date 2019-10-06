@@ -23,6 +23,9 @@ commands:
       - run:
           name: make dataset
           command: bq --location=US mk --dataset $GCP_PROJECT:$BQ_DATASET
+      - run:
+          name: delete dataset
+          command: bq rm -r -f --dataset $GCP_PROJECT:$BQ_DATASET
 
 executors:
   gcloud:
