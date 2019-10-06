@@ -1,0 +1,30 @@
+version: 2.1
+
+commands:
+  setup_credential:
+    steps:
+      - run:
+          name: Setup Credential
+          command: |
+            mkdir -p /etc/google/
+            echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode --ignore-garbase > "${GOOGLE_APPLICATION_CREDENTIALS}"
+
+  make_dataset:
+    steps:
+      - run:
+          name: Hello
+          command: echo "Hello!!"
+
+executors:
+  gcloud:
+    docker:
+      - image: google/cloud-sdk:latest
+        environment:
+          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
+
+jobs:
+  hello:
+    executor: gcloud
+    steps:
+      - checkout
+      - make_dataset
