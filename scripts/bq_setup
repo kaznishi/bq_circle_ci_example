@@ -4,5 +4,10 @@ bq --location=US mk --dataset $GCP_PROJECT:$BQ_DATASET
 
 bq mk \
 --table \
-$GCP_PROJECT:$BQ_DATASET.test \
-string_column:STRING,integer_column:INTEGER,date_column:DATE,timestamp_column:TIMESTAMP
+$GCP_PROJECT:$BQ_DATASET.students \
+id:INTEGER,name:STRING,group:STRING
+
+bq mk \
+--table \
+$GCP_PROJECT:$BQ_DATASET.scores \
+student_id:INTEGER,date:DATE,score:INTEGER

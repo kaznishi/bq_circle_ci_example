@@ -8,6 +8,11 @@ commands:
           command: |
             mkdir -p /etc/google/
             echo "${CI_GOOGLE_SERVICE_KEY_BASE64}" | base64 --decode --ignore-garbage > "${GOOGLE_APPLICATION_CREDENTIALS}"
+  setup_bq_envvar:
+    steps:
+      - run:
+          name: set env BQ_DATASET
+          command: echo "export BQ_DATASET=${BQ_DATASET_PREFIX}_`date '+%Y%m%d'`_${CIRCLE_SHA1:0:7}" >> $BASH_ENV
 
   make_dataset:
     steps:
@@ -15,19 +20,16 @@ commands:
           name: Authorization
           command: gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS}
       - run:
-          name: set env BQ_DATASET
-          command: echo "export BQ_DATASET=${BQ_DATASET_PREFIX}_`date '+%Y%m%d'`_${CIRCLE_SHA1:0:7}" >> $BASH_ENV
-      - run:
-          name: echo datasetname
-          command: echo "${BQ_DATASET}"
-      - run:
           name: make dataset
           command: make bq/setup
-      # - run:
-      #     name: delete dataset
-      #     command: bq rm -r -f --dataset $GCP_PROJECT:$BQ_DATASET
 
 executors:
+  golang:
+    docker:
+      - image: 1.13-stretch
+        environment:
+          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
+          GO111MODULE: "on"
   gcloud:
     docker:
       - image: google/cloud-sdk:latest
@@ -36,14 +38,35 @@ executors:
 
 jobs:
   build:
+    executor: golang
+    working_directory: /go/src/github.com/kaznishi/bq_circle_ci_example
+    steps:
+      - checkout
+      - run:
+          name: check compile
+          command: go build main.go
+  bq_setup:
     executor: gcloud
     steps:
       - checkout
       - setup_credential
+      - setup_bq_envvar
       - make_dataset
+  test:
+    executor: golang
+    working_directory: /go/src/github.com/kaznishi/bq_circle_ci_example
+    steps:
+      - checkout
+      - setup_credential
+      - setup_bq_envvar
+      - run:
+          name: test
+          command: go test -v
 
 workflows:
   version: 2
-  build_and_test:
+  default_flow:
     jobs:
       - build
+      - bq_setup
+      - test

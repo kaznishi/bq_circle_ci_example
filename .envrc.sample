@@ -1,0 +1,2 @@
+export GCP_PROJECT=testproject
+export BQ_DATASET=test
