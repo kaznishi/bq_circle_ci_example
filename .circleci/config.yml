@@ -1,5 +1,18 @@
 version: 2.1
 
+executors:
+  golang:
+    docker:
+      - image: golang:1.13-stretch
+        environment:
+          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
+          GO111MODULE: "on"
+  gcloud:
+    docker:
+      - image: google/cloud-sdk:latest
+        environment:
+          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
+
 commands:
   setup_credential:
     steps:
@@ -14,28 +27,6 @@ commands:
           name: set env BQ_DATASET
           command: echo "export BQ_DATASET=${BQ_DATASET_PREFIX}_`date '+%Y%m%d'`_${CIRCLE_SHA1:0:7}" >> $BASH_ENV
 
-  make_dataset:
-    steps:
-      - run:
-          name: Authorization
-          command: gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS}
-      - run:
-          name: make dataset
-          command: make bq/setup
-
-executors:
-  golang:
-    docker:
-      - image: golang:1.13-stretch
-        environment:
-          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
-          GO111MODULE: "on"
-  gcloud:
-    docker:
-      - image: google/cloud-sdk:latest
-        environment:
-          GOOGLE_APPLICATION_CREDENTIALS: /etc/google/application_default_credentials.json
-
 jobs:
   build:
     executor: golang
@@ -44,14 +35,19 @@ jobs:
       - checkout
       - run:
           name: check compile
-          command: go build main.go
-  bq_setup:
+          command: make build
+  bq_make_dataset:
     executor: gcloud
     steps:
       - checkout
       - setup_credential
       - setup_bq_envvar
-      - make_dataset
+      - run:
+          name: Authorization
+          command: gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS}
+      - run:
+          name: make dataset
+          command: make bq/setup
   test:
     executor: golang
     working_directory: /go/src/github.com/kaznishi/bq_circle_ci_example
@@ -61,7 +57,8 @@ jobs:
       - setup_bq_envvar
       - run:
           name: test
-          command: go test -v
+          command: make test
+  ## for scheduled job
   bq_cleanup_2daysago_datasets:
     executor: gcloud
     steps:
@@ -79,11 +76,11 @@ workflows:
   default_flow:
     jobs:
       - build
-      - bq_setup
+      - bq_make_dataset
       - test:
           requires:
             - build
-            - bq_setup
+            - bq_make_dataset
 
   cleanup_test_dataset:
     triggers:
